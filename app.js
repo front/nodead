@@ -4,7 +4,6 @@ var http = require('http'),
     express = require('express'),
     path = require('path'),
     socketio = require('socket.io'),
-    SessionSockets = require('session.socket.io'),
     redis = require('node-redis'),
     RedisStore = require('connect-redis')(express);
 
@@ -12,8 +11,10 @@ var app = express();
 
 var db = redis.createClient();
 
-var sessionStore = new RedisStore({ client: db }),
-    cookieParser = express.cookieParser('your secret here');
+// Sessions.
+var sessionSecret = 'the cake is a lie',
+    sessionStore = new RedisStore({ client: db }),
+    cookieParser = express.cookieParser(sessionSecret);
 
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
@@ -24,7 +25,7 @@ app.configure(function() {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(cookieParser);
-  app.use(express.session({ store: sessionStore, secret: 'your secret here' }));
+  app.use(express.session({ store: sessionStore, secret: sessionSecret }));
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'static')));
 });
@@ -37,14 +38,21 @@ var routes = require('./routes');
 app.get('/', routes.index);
 
 var server = http.createServer(app),
-    io = socketio.listen(server),
-    sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
+    io = socketio.listen(server);
 
 // Start up the engine.
 server.listen(app.get('port'));
-sessionSockets.on('connection', function (err, socket, session) {
+
+io.sockets.on('connection', function (socket) {
+  // Store the client's session ID.
+  cookieParser(socket.handshake, {}, function (err) {
+    var sid = socket.handshake.signedCookies['connect.sid'];
+    socket.set('cookie', sid);
+  });
+
   socket.emit('news', { hello: 'world' });
+
   socket.on('my other event', function (data) {
-    console.log(session);
+    console.log(data);
   });
 });
