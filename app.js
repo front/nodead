@@ -1,6 +1,4 @@
-// Modules.
 var http = require('http'),
-    connect = require('connect'),
     express = require('express'),
     path = require('path'),
     socketio = require('socket.io'),
@@ -50,6 +48,7 @@ io.sockets.on('connection', function (socket) {
     socket.set('cookie', sid);
   });
 
+  // Example of sending a bunch of ads to client.
   socket.emit('ads', {});
 
   socket.on('like', function (data) {

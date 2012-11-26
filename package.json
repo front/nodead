@@ -6,11 +6,9 @@
     "start": "node app"
   },
   "dependencies": {
-    "connect": "2.7.0",
     "express": "3.0.3",
     "ejs": "*",
     "socket.io": "0.9.11",
-    "session.socket.io": "0.1.2",
     "node-redis": "0.1.5",
     "connect-redis": "1.4.5"
   }
