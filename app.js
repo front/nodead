@@ -12,6 +12,8 @@ var app = express();
 
 var redisClient = redis.createClient(6397, '127.0.0.1');
 
+var cookieParser = express.cookieParser('your secret here');
+
 var sessionStore = new RedisStore({
   client: redisClient,
   host: '127.0.0.1',
@@ -26,19 +28,30 @@ app.configure(function() {
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.cookieParser('your secret here'));
+  app.use(cookieParser);
   app.use(express.session({ store: sessionStore }));
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function(){
+app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
+// Routes.
+var routes = require('./routes');
 app.get('/', routes.index);
-app.get('/users', user.list);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+// Server.
+var server = http.createServer(app),
+    io = socketio.listen(server),
+    sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
+
+// Start up the engine.
+server.listen(app.get('port'));
+sessionSockets.on('connection', function (err, socket, session) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
 });
