@@ -17,20 +17,18 @@
   <link rel="apple-touch-icon-precomposed" sizes="57x57" href="touch-icons/apple-touch-icon-57x57.png">
 
   <!-- Include the compiled Ratchet CSS -->
-  <link rel="stylesheet" href="ratchet.css">
+  <link rel="stylesheet" href="/lib/ratchet/ratchet.css">
 
   <!-- Include the compiled Ratchet JS -->
-  <script src="ratchet.js"></script>
+  <script src="/lib/ratchet/ratchet.js"></script>
 
-
+  <!-- Include socket.io -->
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-  var socket = io.connect();
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-  </script>
+
+  <!-- Include jQuery -->
+  <script src="/lib/jquery-1.8.3.min.js"></script>
+
+  <script src="/js/client.js"></script>
 
   <!-- Intro paragraph styles. Delete once you start using this page -->
   <style type="text/css">
@@ -71,8 +69,8 @@
 
     <br> 
 
-    <a class="button-block button-positive">Like it :)</a>
-    <a class="button-block button-negative">Dislike :(</a>
+    <a class="button-block button-positive" id="like">Like it :)</a>
+    <a class="button-block button-negative" id="dislike">Dislike :(</a>
 
   </div>
 
