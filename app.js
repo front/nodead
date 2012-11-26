@@ -50,9 +50,13 @@ io.sockets.on('connection', function (socket) {
     socket.set('cookie', sid);
   });
 
-  socket.emit('news', { hello: 'world' });
+  socket.emit('ads', {});
 
-  socket.on('my other event', function (data) {
+  socket.on('like', function (data) {
+    console.log(data);
+  });
+
+  socket.on('dislike', function (data) {
     console.log(data);
   });
 });
