@@ -28,7 +28,7 @@ Or [by hand](http://redis.io/download).
 
     cd nodead
     npm install
-    node app
+    npm start
 
 #### Check it out!
 
