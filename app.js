@@ -10,15 +10,10 @@ var http = require('http'),
 
 var app = express();
 
-var redisClient = redis.createClient(6397, '127.0.0.1');
+var db = redis.createClient();
 
-var sessionStore = new RedisStore({
-  client: redisClient,
-  host: '127.0.0.1',
-  port: 6397
-});
-
-var cookieParser = express.cookieParser('your secret here');
+var sessionStore = new RedisStore({ client: db }),
+    cookieParser = express.cookieParser('your secret here');
 
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
@@ -29,7 +24,7 @@ app.configure(function() {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(cookieParser);
-  app.use(express.session({ store: sessionStore }));
+  app.use(express.session({ store: sessionStore, secret: 'your secret here' }));
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'static')));
 });
