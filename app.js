@@ -1,8 +1,12 @@
-var express = require('express'),
-    routes = require('./routes'),
-    user = require('./routes/user'),
-    http = require('http'),
-    path = require('path');
+// Modules.
+var http = require('http'),
+    connect = require('connect'),
+    express = require('express'),
+    path = require('path'),
+    socketio = require('socket.io'),
+    SessionSockets = require('session.socket.io'),
+    redis = require('node-redis'),
+    RedisStore = require('connect-redis')(express);
 
 var app = express();
 
