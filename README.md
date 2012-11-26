@@ -7,7 +7,7 @@
 
 # Instructions
 
-#### 1 Install Node
+#### Install Node
 
 http://nodejs.org/download/
 
@@ -18,9 +18,7 @@ With [Homebrew](http://mxcl.github.com/homebrew/):
 
     brew install redis
 
-By hand:
-
-http://redis.io/download
+Or [by hand](http://redis.io/download).
 
 #### Clone the repository
 
@@ -29,8 +27,9 @@ http://redis.io/download
 #### Run the app
 
     cd nodead
+    npm install
     node app
 
-#### Check it out
+#### Check it out!
 
-http://localhost:3000/
+[http://localhost:3000/](http://localhost:3000/)
