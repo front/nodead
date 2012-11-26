@@ -10,7 +10,9 @@ var http = require('http'),
 
 var app = express();
 
-app.configure(function(){
+var redisClient = redis.createClient(6397, '127.0.0.1');
+
+app.configure(function() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
