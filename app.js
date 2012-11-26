@@ -12,13 +12,13 @@ var app = express();
 
 var redisClient = redis.createClient(6397, '127.0.0.1');
 
-var cookieParser = express.cookieParser('your secret here');
-
 var sessionStore = new RedisStore({
   client: redisClient,
   host: '127.0.0.1',
   port: 6397
 });
+
+var cookieParser = express.cookieParser('your secret here');
 
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
@@ -31,18 +31,16 @@ app.configure(function() {
   app.use(cookieParser);
   app.use(express.session({ store: sessionStore }));
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.static(path.join(__dirname, 'static')));
 });
 
 app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
-// Routes.
 var routes = require('./routes');
 app.get('/', routes.index);
 
-// Server.
 var server = http.createServer(app),
     io = socketio.listen(server),
     sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
