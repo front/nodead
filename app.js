@@ -45,6 +45,6 @@ server.listen(app.get('port'));
 sessionSockets.on('connection', function (err, socket, session) {
   socket.emit('news', { hello: 'world' });
   socket.on('my other event', function (data) {
-    console.log(data);
+    console.log(session);
   });
 });
