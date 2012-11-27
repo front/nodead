@@ -1,7 +1,7 @@
 $(function () {
   var socket = io.connect();
   var current;
-  socket.on('ads', function (data) {
+  socket.on('ad', function (data) {
     console.log(data);
 
    var newListEl =  '<li class="ad"><img src="' + data.img + '"><span class="slide-text">← Slide me</span></li>';
