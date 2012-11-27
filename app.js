@@ -48,8 +48,10 @@ io.sockets.on('connection', function (socket) {
     socket.set('cookie', sid);
   });
 
-  // Example of sending a bunch of ads to client.
-  socket.emit('ads', {});
+  // Sending the first ad to the client
+db.hgetall("ad:1", function (err, obj) {
+  socket.emit('new_ad', obj.toString());
+});
 
   socket.on('like', function (data) {
     console.log(data);
@@ -59,3 +61,18 @@ io.sockets.on('connection', function (socket) {
     console.log(data);
   });
 });
+redis.debug_mode = true;
+db.on("error", function (err) {
+  console.log("Error " + err);
+});
+
+// Import test ads
+var testAds = require('./testdata.json');
+
+// Insert test ads into the 'ad' hashtable
+for (ad in testAds) {
+  for(prop in testAds[ad]){
+    db.hmset("ad:"+ad, prop, testAds[ad][prop]);  
+  }
+}
+
