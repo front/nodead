@@ -1,7 +1,7 @@
 var utils = require('./utils'),
     db = require('./db');
 
-var ads = require('../testdata.json');
+var ads = require('./testdata.json');
 
 utils.async.series({
   // Insert test ads into the 'ad' hashtable.
