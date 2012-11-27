@@ -22,13 +22,13 @@ app.configure(function() {
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
+  app.use(express.static(path.join(__dirname, 'static')));
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(cookieParser);
   app.use(express.session({ store: sessionStore, secret: sessionSecret }));
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'static')));
 });
 
 app.configure('development', function() {
@@ -71,6 +71,8 @@ var getRandomAd = function (sid, callback) {
   });
 };
 
+// Listen for socket connections.
+io.set('log level', 1);
 io.sockets.on('connection', function (socket) {
   // Store the client's session ID on connection.
   cookieParser(socket.handshake, {}, function (err) {
