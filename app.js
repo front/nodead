@@ -4,17 +4,17 @@ var http = require('http'),
     socketio = require('socket.io'),
     RedisStore = require('connect-redis')(express);
 
-var app = express();
-
 var utils = require('./utils'),
     db = require('./db'),
     routes = require('./routes'),
     sockets = require('./sockets');
 
-// Sessions.
+// Session handling.
 var sessionSecret = 'the cake is a lie',
     sessionStore = new RedisStore({ client: db }),
     cookieParser = express.cookieParser(sessionSecret);
+
+var app = express();
 
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
@@ -53,10 +53,6 @@ io.sockets.on('connection', function (socket) {
     socket.set('sid', socket.handshake.signedCookies['connect.sid']);
   });
 
-
-//redis.debug_mode = true;
-db.on("error", function (err) {
-  console.log("Error " + err);
   // Delegate to connection handler.
   sockets.connection(socket);
 });
