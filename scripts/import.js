@@ -20,7 +20,7 @@ async.series({
         args.push(ad[name]);
       });
 
-      multi.hmset(args, function (err, replies) {});
+      multi.hmset(args);
     }
 
     multi.exec(callback);
