@@ -1,0 +1,110 @@
+[
+	{
+		"Title": "Reis til Amsterdam!",
+		"Category": "Travel",
+		"Gender": "Both",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-amsterdam.jpeg"
+	},
+	{
+		"Title": "Jentetur til Køben",
+		"Category": "Travel",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-copenhagen.jpeg"
+	},
+	{
+		"Title": "Deilig reise til Kypros",
+		"Category": "Travel",
+		"Gender": "Both",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-cyprus.jpeg"
+	},
+	{
+		"Title": "Nyt Venezia!",
+		"Category": "Travel",
+		"Gender": "Both",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-venezia.jpeg"
+	},
+	{
+		"Title": "Opplev eksotiske India",
+		"Category": "Travel",
+		"Gender": "Both",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-india.jpeg"
+	},
+	{
+		"Title": "Få hvitere tenner i dag",
+		"Category": "Beauty",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/beauty-dentist.jpeg"
+	},
+	{
+		"Title": "Bransjens beste blender",
+		"Category": "Kitchen",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/home-blender.jpeg"
+	},
+	{
+		"Title": "Fjern smilerynken",
+		"Category": "Beauty",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/beauty.jpeg"
+	},
+	{
+		"Title": "Vil du ha vakre øyne? Bruk laser!",
+		"Category": "Beauty",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/beauty-eye.jpeg"
+	},
+	{
+		"Title": "Ansiktskremen som brukes av Paris",
+		"Category": "Beauty",
+		"Gender": "Women",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/beauty-resolution.jpeg"
+	},
+	{
+		"Title": "Snøscooter ferie for de hardbarkede",
+		"Category": "Travel",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-scooter.jpeg"
+	},
+	{
+		"Title": "Julenissedrakt for mannen i huset!",
+		"Category": "Clothing",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/clothing-santa.jpeg"
+	},
+	{
+		"Title": "Printerpatroner til halv pris!",
+		"Category": "Gadget",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/gadget-printercartridge.jpeg"
+	},
+	{
+		"Title": "Mandig Android-telefon med 40% avslag",
+		"Category": "Gadget",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/gadget-android.jpeg"
+	},
+	{
+		"Title": "Klokke med testosteronmåler",
+		"Category": "Gadget",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/gadget-manlywatch.jpeg"
+	},
+	{
+		"Title": "Kule minnepenner",
+		"Category": "Gadget",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/gadget-usbstick.jpeg"
+	},
+	{
+		"Title": "Golftur med gutta",
+		"Category": "Travel",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/travel-golf.jpeg"
+	},
+	{
+		"Title": "De heteste slipsene!",
+		"Category": "Clothing",
+		"Gender": "Men",
+		"Img": "https://raw.github.com/front/nodead/master/static/img/clothing-ties.jpeg"
+	}
+]
