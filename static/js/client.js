@@ -19,7 +19,6 @@ $(function () {
   $('#like').on('click', function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
     socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
-    socket.emit('next');
     // $('ul li:first').remove();
 
   });
@@ -27,6 +26,5 @@ $(function () {
   $('#dislike').on('click', function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
     socket.emit('dislike', {"id": current.id, "timeOnAd": timeOnAd});
-    socket.emit('next');
   });
 });
