@@ -4,7 +4,7 @@ $(function () {
   socket.on('ads', function (data) {
     console.log(data);
 
-   var newListEl =  '<li class="ad"><img src="' + data.Img + '"><span class="slide-text">← Slide me</span></li>';
+   var newListEl =  '<li class="ad"><img src="' + data.img + '"><span class="slide-text">← Slide me</span></li>';
     $("ul").append(newListEl);
     $('ul li:first').remove();
 

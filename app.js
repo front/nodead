@@ -50,17 +50,20 @@ io.sockets.on('connection', function (socket) {
   });
 
   // Send the first ad to get going
-  socket.emit('ads', obj);
+  socket.emit('ads', testAds[0]);
 
   // Handle incoming data from clients
   socket.on('like', function (data) {
     console.log("User seems to really like item " + data);
-    socket.emit('ads', obj2);
+
+    id = Math.floor(Math.random() * testAds.length);
+    socket.emit('ads', testAds[id]);
   });
 
   socket.on('dislike', function (data) {
     console.log("Yikes, user seems to really hate item " + data);
-    socket.emit('ads', obj);
+    id = Math.floor(Math.random() * testAds.length);
+    socket.emit('ads', testAds[id]);
   });
 
 
@@ -80,27 +83,3 @@ for (ad in testAds) {
     db.hmset("ad:"+ad, prop, testAds[ad][prop]);  
   }
 }
-
-
-// Testdata....
-var obj = 
-{
-  "id": "12",
-  "Title": "Jentetur til Køben",
-  "Category": "Travel",
-  "Gender": "Women",
-  "Img": "https://raw.github.com/front/nodead/master/static/img/travel-copenhagen.jpeg"
-};
-
-
-
-var obj2 = 
-{
-  "id": "13",
-  "Title": "Nyt Venezia!",
-  "Category": "Travel",
-  "Gender": "Both",
-  "Img": "https://raw.github.com/front/nodead/master/static/img/travel-venezia.jpeg"
-};
-
-
