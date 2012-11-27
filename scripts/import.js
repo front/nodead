@@ -1,10 +1,10 @@
-var async = require('async'),
     redis = require('redis'),
     db = redis.createClient();
+var utils = require('./utils'),
 
 var testAds = require('../testdata.json');
 
-async.series({
+utils.async.series({
   // Insert test ads into the 'ad' hashtable.
   import: function (callback) {
     var multi = db.multi();

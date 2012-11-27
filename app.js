@@ -1,7 +1,6 @@
 var http = require('http'),
     express = require('express'),
     path = require('path'),
-    async = require('async'),
     socketio = require('socket.io'),
     redis = require('redis'),
     RedisStore = require('connect-redis')(express);
@@ -9,6 +8,7 @@ var http = require('http'),
 var app = express();
 
 var db = redis.createClient();
+var utils = require('./utils'),
 
 var testAds = require('./testdata.json');
 
