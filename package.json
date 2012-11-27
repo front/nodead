@@ -9,7 +9,7 @@
     "express": "3.0.3",
     "ejs": "*",
     "socket.io": "0.9.11",
-    "node-redis": "0.1.5",
+    "redis": "0.8.2",
     "connect-redis": "1.4.5"
   }
 }

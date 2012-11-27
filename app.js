@@ -2,7 +2,7 @@ var http = require('http'),
     express = require('express'),
     path = require('path'),
     socketio = require('socket.io'),
-    redis = require('node-redis'),
+    redis = require('redis'),
     RedisStore = require('connect-redis')(express);
 
 var app = express();
