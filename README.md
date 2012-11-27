@@ -20,6 +20,9 @@ With [Homebrew](http://mxcl.github.com/homebrew):
 
 Or [by hand](http://redis.io/download).
 
+#### Install nodemon globally ####
+    [sudo]npm install nodemon -g
+
 #### Install the app
 
     git clone git@github.com:front/nodead.git
