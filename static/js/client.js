@@ -19,12 +19,12 @@ $(function () {
   $('#like').on('click', function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
     socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
-    console.log("like" + current.id);
     // $('ul li:first').remove();
 
   });
 
   $('#dislike').on('click', function () {
-    socket.emit('dislike', current.id);
+    var timeOnAd = new Date().getTime() - current.timeStart;
+    socket.emit('dislike', {"id": current.id, "timeOnAd": timeOnAd});
   });
 });
