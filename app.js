@@ -54,14 +54,14 @@ io.sockets.on('connection', function (socket) {
 
   // Handle incoming data from clients
   socket.on('like', function (data) {
-    console.log("User seems to really like item " + data);
+    console.log("User seems to really like item " + data.id + " so much that he stayed on it for " + data.timeOnAd/1000 + " seconds");
 
     id = Math.floor(Math.random() * testAds.length);
     socket.emit('ads', testAds[id]);
   });
 
   socket.on('dislike', function (data) {
-    console.log("Yikes, user seems to really hate item " + data);
+    console.log("Yikes, user seems to really hate item " + data.id + " so much that he stayed on it for " + data.timeOnAd/1000 + " seconds");
     id = Math.floor(Math.random() * testAds.length);
     socket.emit('ads', testAds[id]);
   });

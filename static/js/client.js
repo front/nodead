@@ -9,12 +9,16 @@ $(function () {
     $('ul li:first').remove();
 
     current = data;
+    current.timeStart = new Date().getTime();
+    console.log('current:');
+    console.log(current);
 
 
   });
 
   $('#like').on('click', function () {
-    socket.emit('like', current.id);
+    var timeOnAd = new Date().getTime() - current.timeStart;
+    socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
     console.log("like" + current.id);
     // $('ul li:first').remove();
 
