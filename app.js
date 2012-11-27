@@ -42,26 +42,31 @@ var server = http.createServer(app),
 server.listen(app.get('port'));
 
 io.sockets.on('connection', function (socket) {
+  console.log('Connected to client');
   // Store the client's session ID.
   cookieParser(socket.handshake, {}, function (err) {
     var sid = socket.handshake.signedCookies['connect.sid'];
     socket.set('cookie', sid);
   });
 
-  // Sending the first ad to the client
-db.hgetall("ad:1", function (err, obj) {
-  socket.emit('new_ad', obj.toString());
-});
+  // Send the first ad to get going
+  socket.emit('ads', obj);
 
+  // Handle incoming data from clients
   socket.on('like', function (data) {
-    console.log(data);
+    console.log("User seems to really like item " + data);
+    socket.emit('ads', obj2);
   });
 
   socket.on('dislike', function (data) {
-    console.log(data);
+    console.log("Yikes, user seems to really hate item " + data);
+    socket.emit('ads', obj);
   });
+
+
+
 });
-redis.debug_mode = true;
+//redis.debug_mode = true;
 db.on("error", function (err) {
   console.log("Error " + err);
 });
@@ -75,4 +80,27 @@ for (ad in testAds) {
     db.hmset("ad:"+ad, prop, testAds[ad][prop]);  
   }
 }
+
+
+// Testdata....
+var obj = 
+{
+  "id": "12",
+  "Title": "Jentetur til Køben",
+  "Category": "Travel",
+  "Gender": "Women",
+  "Img": "https://raw.github.com/front/nodead/master/static/img/travel-copenhagen.jpeg"
+};
+
+
+
+var obj2 = 
+{
+  "id": "13",
+  "Title": "Nyt Venezia!",
+  "Category": "Travel",
+  "Gender": "Both",
+  "Img": "https://raw.github.com/front/nodead/master/static/img/travel-venezia.jpeg"
+};
+
 
