@@ -2,13 +2,12 @@ var http = require('http'),
     express = require('express'),
     path = require('path'),
     socketio = require('socket.io'),
-    redis = require('redis'),
     RedisStore = require('connect-redis')(express);
 
 var app = express();
 
-var db = redis.createClient();
 var utils = require('./utils'),
+    db = require('./db'),
 
 var testAds = require('./testdata.json');
 

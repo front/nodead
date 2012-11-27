@@ -1,6 +1,5 @@
-    redis = require('redis'),
-    db = redis.createClient();
 var utils = require('./utils'),
+    db = require('./db');
 
 var testAds = require('../testdata.json');
 
