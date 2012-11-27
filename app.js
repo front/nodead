@@ -8,6 +8,7 @@ var app = express();
 
 var utils = require('./utils'),
     db = require('./db'),
+    routes = require('./routes');
 
 var testAds = require('./testdata.json');
 
@@ -34,8 +35,10 @@ app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
-var routes = require('./routes');
-app.get('/', routes.index);
+// Routes.
+utils.each(routes, function (callback, path) {
+  app.get(path, callback);
+});
 
 var server = http.createServer(app),
     io = socketio.listen(server);
