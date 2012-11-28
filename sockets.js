@@ -27,8 +27,8 @@ exports.connection = function (socket) {
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
         // Return a new ad for this user.
-        ads.getByProfile(socket, function (err, ad) {
-          socket.emit('ad', ad);
+        ads.getByProfile(socket, function (err, data) {
+          socket.emit('ad', data);
         });
       });
     });
@@ -49,8 +49,8 @@ exports.connection = function (socket) {
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (dislike after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
         // Return a new ad for this user.
-        ads.getByProfile(socket, function (err, ad) {
-          socket.emit('ad', ad);
+        ads.getByProfile(socket, function (err, data) {
+          socket.emit('ad', data);
         });
       });
     })

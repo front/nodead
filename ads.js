@@ -4,11 +4,11 @@ var utils = require('./utils'),
 // The test data.
 var testdata = require('./testdata.json');
 
-var settings = {
-  minimum: 3 // Minimum amount of likes before showing ads of that type
-};
-
 var ads = module.exports = {};
+
+ads.settings = {
+  threshold: 3 // Minimum amount of likes before showing ads of that type
+};
 
 // Loads an ad by its ID.
 ads.load = function (id, callback) {
@@ -20,36 +20,57 @@ ads.getRandom = function (callback) {
   db.srandmember(set, callback);
 };
 
+// Returns a user's liked/disliked categories (ordered by score).
+ads.getUsersCategories = function (sid, threshold, callback) {
+  if (utils.isFunction(threshold)) {
+    callback = threshold;
+    threshold = null;
+  }
+
+  var args = ['user:' + sid + ':categories', '+inf', '-inf', 'withscores'];
+
+  db.zrevrangebyscore(args, function (err, results) {
+    var categories = [];
+
+    if (results.length) {
+      for (var i = 0, len = results.length / 2; i < len; i++) {
+        var item = results.splice(0, 2);
+
+        if (!utils.isNumber(threshold) || item[1] >= threshold) {
+          categories.push({ name: item[0], score: parseInt(item[1], 10) });
+        }
+      }
+    }
+
+    callback(err, categories);
+  });
+};
+
 // Returns an ad matching the user's profile.
 ads.getByProfile = function (socket, callback) {
+  var self = this;
+
   socket.get('sid', function (err, sid) {
     var userSet = 'user:' + sid + ':ads';
 
     utils.async.waterfall([
-      // Get user's liked/disliked categories (ordered by score).
-      function getUsersCategories (callback) {
-        var args = ['user:' + sid + ':categories', '+inf', settings.minimum, 'withscores'];
-        db.zrevrangebyscore(args, callback);
-      },
+      self.getUsersCategories.bind(self, sid, self.settings.threshold),
 
       // Create user's set of ads from liked categories, if any.
-      function createUserSet (result, callback) {
-        if (result.length) {
+      function createUserSet (categories, callback) {
+        if (categories.length) {
           var args = [userSet];
 
-          for (var i = 0, len = result.length / 2; i < len; i++) {
-            var item = result.splice(0, 2);
-            var category = item[0];
-            var score = item[1];
-            args.push('index:category:' + category);
-          }
+          categories.forEach(function (category) {
+            args.push('index:category:' + category.name);
+          });
 
-          db.sunionstore(args, callback);
+          // Store a union of ads from categories into user's set.
+          return db.sunionstore(args, callback);
         }
-        else {
-          // Let the following task know the user hasn't liked any categories.
-          callback(null, 0);
-        }
+
+        // Let the next task know the user hasn't liked any categories enough.
+        callback(null, 0);
       },
 
       // Filter the user's set by gender, if specified.
@@ -86,13 +107,23 @@ ads.getByProfile = function (socket, callback) {
       }
     ],
 
-    // Return results to callback.
+    // Return results to callback. Output:
+    // {
+    //   ad: {…},
+    //   categories: [{…}, {…}, …]
+    // }
     function (err, id) {
       if (err) {
         callback(err);
       }
       else {
-        ads.load(id, callback);
+        utils.async.parallel({
+          ad: self.load.bind(self, id),
+          categories: self.getUsersCategories.bind(self, sid)
+        },
+        function (err, results) {
+          callback(err, results);
+        });
       }
     });
   });
