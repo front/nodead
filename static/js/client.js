@@ -9,8 +9,14 @@ $(function () {
     var el = constructNewAdElement(data);
     addNewListElement(el);
     constructCategoriesList(data);
+
     current = data.ads[0];
     current.timeStart = new Date().getTime();
+  });
+  
+  $('.slider').on('slide',function(){
+    var timeOnAd = new Date().getTime() - current.timeStart;
+    socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
   });
 
   $('#like').on('click', function () {
