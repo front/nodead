@@ -8,14 +8,15 @@ exports.connection = function (socket) {
   });
 
   // Send the first ad to the client.
-  ads.getByProfile(socket, function (err, data) {
+  ads.getByProfile(1, socket, function (err, data) {
+    if (err) return console.log(err);
     socket.emit('ad', data);
   });
 
   // User likes an ad.
   socket.on('like', function (data) {
     // First load the ad and user's session ID.
-    utils.async.series({
+    utils.async.parallel({
       ad: ads.load.bind(ads, data.id),
       sid: socket.get.bind(socket, 'sid')
     },
@@ -26,8 +27,9 @@ exports.connection = function (socket) {
       db.zincrby('user:' + sid + ':categories', 1, ad.category, function (err, score) {
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
-        // Return a new ad for this user.
-        ads.getByProfile(socket, function (err, data) {
+        // Return new ads for this user.
+        ads.getByProfile(3, socket, function (err, data) {
+          if (err) return console.log(err);
           socket.emit('ad', data);
         });
       });
@@ -37,7 +39,7 @@ exports.connection = function (socket) {
   // User dislikes an ad.
   socket.on('dislike', function (data) {
     // First load the ad and user's session ID.
-    utils.async.series({
+    utils.async.parallel({
       ad: ads.load.bind(ads, data.id),
       sid: socket.get.bind(socket, 'sid')
     },
@@ -48,22 +50,24 @@ exports.connection = function (socket) {
       db.zincrby('user:' + sid + ':categories', -1, ad.category, function (err, score) {
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (dislike after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
-        // Return a new ad for this user.
-        ads.getByProfile(socket, function (err, data) {
+        // Return new ads for this user.
+        ads.getByProfile(3, socket, function (err, data) {
+          if (err) return console.log(err);
           socket.emit('ad', data);
         });
       });
     })
   });
 
-  // User wants another ad.
+  // User wants more ads.
   socket.on('next', function (data) {
-    ads.getByProfile(socket, function (err, ad) {
+    ads.getByProfile(3, socket, function (err, ad) {
+      if (err) return console.log(err);
       socket.emit('ad', ad);
     });
   });
 
   socket.on('gender', function (name) {
-    socket.set('gender', name, function () {});
+    socket.set('gender', name);
   });
 };

@@ -15,9 +15,14 @@ ads.load = function (id, callback) {
   callback(null, testdata[id]);
 };
 
-// Returns a random ad.
-ads.getRandom = function (callback) {
-  db.srandmember(set, callback);
+// Returns the specified number of random ads (defaults to 1).
+ads.getRandom = function (set, amount, callback) {
+  if (utils.isFunction(amount)) {
+    callback = amount;
+    amount = 1;
+  }
+
+  db.srandmember(set, amount, callback);
 };
 
 // Returns a user's liked/disliked categories (ordered by score).
@@ -46,8 +51,8 @@ ads.getUsersCategories = function (sid, threshold, callback) {
   });
 };
 
-// Returns an ad matching the user's profile.
-ads.getByProfile = function (socket, callback) {
+// Returns the specified amount of ads matching the user's profile.
+ads.getByProfile = function (amount, socket, callback) {
   var self = this;
 
   socket.get('sid', function (err, sid) {
@@ -103,28 +108,38 @@ ads.getByProfile = function (socket, callback) {
         });
       },
 
-      // Get a random ad from the set (user's set, gender's index or all ads).
+      // Get random ads from the set (user's set, gender's index or all ads).
       function getRandomAd (set, callback) {
-        db.srandmember(set, callback);
+        self.getRandom(set, amount, callback);
       }
     ],
 
     // Return results to callback. Output:
     // {
-    //   ad: {…},
+    //   ads: [{…}, {…}, …],
     //   categories: [{…}, {…}, …]
     // }
-    function (err, id) {
+    function (err, ids) {
       if (err) {
         callback(err);
       }
       else {
-        utils.async.parallel({
-          ad: self.load.bind(self, id),
-          categories: self.getUsersCategories.bind(self, sid)
-        },
-        function (err, results) {
-          callback(err, results);
+        // Load ads and categories in parallel.
+        var tasks = [self.getUsersCategories.bind(self, sid)];
+        ids.forEach(function (id) {
+          tasks.push(self.load.bind(self, id));
+        });
+
+        utils.async.parallel(tasks, function (err, results) {
+          // First item is categories, the rest are ads.
+          var categories = results.shift();
+
+          var data = {
+            ads: results,
+            categories: categories
+          };
+
+          callback(err, data);
         });
       }
     });
