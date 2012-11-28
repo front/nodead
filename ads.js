@@ -59,6 +59,7 @@ ads.getByProfile = function (socket, callback) {
       // Create user's set of ads from liked categories, if any.
       function createUserSet (categories, callback) {
         if (categories.length) {
+          // Destination set.
           var args = [userSet];
 
           categories.forEach(function (category) {
@@ -66,11 +67,12 @@ ads.getByProfile = function (socket, callback) {
           });
 
           // Store a union of ads from categories into user's set.
-          return db.sunionstore(args, callback);
+          db.sunionstore(args, callback);
         }
-
-        // Let the next task know the user hasn't liked any categories enough.
-        callback(null, 0);
+        else {
+          // Let the next task know the user hasn't liked any categories enough.
+          callback(null, 0);
+        }
       },
 
       // Filter the user's set by gender, if specified.
