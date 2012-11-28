@@ -4,6 +4,10 @@ var utils = require('./utils'),
 // The test data.
 var testdata = require('./testdata.json');
 
+var settings = {
+  minimum: 3 // Minimum amount of likes before showing ads of that type
+};
+
 var ads = module.exports = {};
 
 // Loads an ad by its ID.
@@ -22,20 +26,23 @@ ads.getByProfile = function (socket, callback) {
     var userSet = 'user:' + sid + ':ads';
 
     utils.async.waterfall([
-      // Get user's liked categories.
-      function getLikedCategories (callback) {
-        var args = ['user:' + sid + ':categories', '+inf', 3];
+      // Get user's liked/disliked categories (ordered by score).
+      function getUsersCategories (callback) {
+        var args = ['user:' + sid + ':categories', '+inf', settings.minimum, 'withscores'];
         db.zrevrangebyscore(args, callback);
       },
 
-      // Copy ads from user's liked categories, if any, to user's set.
-      function copyCategoryAds (categories, callback) {
-        if (categories.length) {
+      // Create user's set of ads from liked categories, if any.
+      function createUserSet (result, callback) {
+        if (result.length) {
           var args = [userSet];
 
-          categories.forEach(function (category) {
+          for (var i = 0, len = result.length / 2; i < len; i++) {
+            var item = result.splice(0, 2);
+            var category = item[0];
+            var score = item[1];
             args.push('index:category:' + category);
-          });
+          }
 
           db.sunionstore(args, callback);
         }
@@ -80,7 +87,7 @@ ads.getByProfile = function (socket, callback) {
     ],
 
     // Return results to callback.
-    function done (err, id) {
+    function (err, id) {
       if (err) {
         callback(err);
       }
