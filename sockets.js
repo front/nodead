@@ -79,4 +79,16 @@ exports.connection = function (socket) {
   socket.on('gender', function (name) {
     socket.set('gender', name);
   });
+
+  // If a client clicks a facebook like, increase he's like of that category by 10
+  socket.on('facebook-like', function (data){
+    console.log(data);
+    socket.get('sid', function (err, sid) {
+      if (err) return console.log(err);
+      db.zincrby('user:' + sid + ':categories', 10, data.category, function (err, score) {
+        if (err) return console.log(err);
+        console.log(sid + ' on ' + data.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
+      });
+    });
+  });
 };
