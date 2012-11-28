@@ -62,4 +62,8 @@ exports.connection = function (socket) {
       socket.emit('ad', ad);
     });
   });
+
+  socket.on('set gender', function (name) {
+    socket.set('gender', name, function () {});
+  });
 };
