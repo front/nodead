@@ -63,7 +63,7 @@ exports.connection = function (socket) {
     });
   });
 
-  socket.on('set gender', function (name) {
+  socket.on('gender', function (name) {
     socket.set('gender', name, function () {});
   });
 };
