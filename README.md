@@ -20,6 +20,8 @@ With [Homebrew](http://mxcl.github.com/homebrew):
 
 Or [by hand](http://redis.io/download).
 
+Redis 2.6+ is required.
+
 #### Install nodemon
     [sudo] npm install nodemon -g
 
