@@ -10,7 +10,9 @@
     "ejs": "*",
     "socket.io": "0.9.11",
     "redis": "0.8.2",
+    "hiredis": "0.1.14",
     "connect-redis": "1.4.5",
-    "async": "0.1.22"
+    "async": "0.1.22",
+    "underscore": "1.4.2"
   }
 }
