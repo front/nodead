@@ -4,6 +4,7 @@ var utils = require('./utils'),
 
 exports.connection = function (socket) {
   socket.get('sid', function (err, sid) {
+    if (err) return console.log(err);
     console.log(sid + ' connected');
   });
 
@@ -21,10 +22,14 @@ exports.connection = function (socket) {
       sid: socket.get.bind(socket, 'sid')
     },
     function (err, results) {
+      if (err) return console.log(err);
+
       var ad = results.ad, sid = results.sid;
 
       // Increment user's love for the category.
       db.zincrby('user:' + sid + ':categories', 1, ad.category, function (err, score) {
+        if (err) return console.log(err);
+
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
         // Return new ads for this user.
@@ -44,10 +49,14 @@ exports.connection = function (socket) {
       sid: socket.get.bind(socket, 'sid')
     },
     function (err, results) {
+      if (err) return console.log(err);
+
       var ad = results.ad, sid = results.sid;
 
       // Decrement user's love for the category. Or increment hate, if you like.
       db.zincrby('user:' + sid + ':categories', -1, ad.category, function (err, score) {
+        if (err) return console.log(err);
+
         console.log(sid + ' on ' + ad.category + ': ' + score + ' (dislike after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
 
         // Return new ads for this user.

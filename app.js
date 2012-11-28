@@ -50,6 +50,7 @@ io.set('log level', 1);
 io.sockets.on('connection', function (socket) {
   // Store the client's session ID.
   cookieParser(socket.handshake, {}, function (err) {
+    if (err) return console.log(err);
     socket.set('sid', socket.handshake.signedCookies['connect.sid']);
   });
 
