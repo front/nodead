@@ -4,11 +4,11 @@ $(function () {
   socket.on('ad', function (data) {
     console.log(data);
 
-   var newListEl =  '<li class="ad"><h2>' + data.title + '</h2><img src="' + data.img + '"><span class="slide-text">← Slide me</span></li>';
+   var newListEl =  '<li class="ad"><h2>' + data.ad.title + '</h2><img src="' + data.ad.img + '"><span class="slide-text">← Slide me</span></li>';
     $("ul#ads").append(newListEl);
     $('ul#ads li:first').remove();
 
-    current = data;
+    current = data.ad;
     current.timeStart = new Date().getTime();
     console.log('current:');
     console.log(current);
