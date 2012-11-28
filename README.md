@@ -20,9 +20,8 @@ With [Homebrew](http://mxcl.github.com/homebrew):
 
 Or [by hand](http://redis.io/download).
 
-#### Install some modules globally (if not already installed) ####
-    [sudo]npm install nodemon -g
-    [sudo]npm install async -g
+#### Install nodemon
+    [sudo] npm install nodemon -g
 
 #### Install the app
 
