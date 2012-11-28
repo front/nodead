@@ -4,6 +4,10 @@ var utils = require('./utils'),
 // The test data.
 var testdata = require('./testdata.json');
 
+var settings = {
+  minimum: 3 // Minimum amount of likes before showing ads of that type
+};
+
 var ads = module.exports = {};
 
 // Loads an ad by its ID.
@@ -24,7 +28,7 @@ ads.getByProfile = function (socket, callback) {
     utils.async.waterfall([
       // Get user's liked categories.
       function getLikedCategories (callback) {
-        var args = ['user:' + sid + ':categories', '+inf', 3];
+        var args = ['user:' + sid + ':categories', '+inf', settings.minimum, 'withscores'];
         db.zrevrangebyscore(args, callback);
       },
 
