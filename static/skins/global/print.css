@@ -1,0 +1,140 @@
+/* Fjerner reklame*/
+.ad,
+.mnopolarisAd,
+#topAd,
+#adRight,
+#banner1,
+#header,
+#footer,
+#netboard1,
+#miniboard1 {
+    display : none;
+}
+
+/* Hovedteksten vises i hele sin bredde*/
+
+ /*Fjerner innrykk for hovedteksten*/
+.gridRow .pre1, .pre1{
+    margin-left: 0;
+}
+
+/* "Vingene" som gir skygge nederst på siden*/
+.ad:before,#page:before,#page:after{
+ content:none;
+}
+/* Fjerner hovedrammen*/
+#bt,#viewport,#page{
+   box-shadow: none;
+   border-top: none;
+   border-bottom: none;
+   border-right: none;
+   border-left: none;
+}
+
+/* redefine layout */
+#viewport .span10,
+#viewport .span9,
+#viewport .span8,
+#viewport .span7,
+#viewport .span6,
+#viewport .span5 {
+    clear:both;
+    float:none;
+    width:100%;
+}
+
+/* storyContent styles article */
+.storyContent .pull1,
+.storyContent .quote {
+   margin-left: 0;
+}
+
+.storyContent .left,
+.storyContent .floatLeft,
+.storyContent .quote {
+    clear:both;
+}
+
+.storyContent h1,
+.storyContent h2,
+.storyContent h3 {
+    clear:both;
+}
+
+/*slideShow styles */
+.slideshow-wrapper {
+    background: none;
+}
+
+.slideshow-list .slideshow-element {
+    display:none;
+    float:none;
+}
+
+.slideshow-list .slideshow-element:first-child {
+    display:block;
+}
+
+.slideshow-list .slideshow-element img {
+    display:block;
+    width:auto;
+}
+
+/* Høyrekolonne med "mest lest", Facebook ect*/
+.widget.relatedContents.stories{
+   display : none;
+}
+
+.widget.pageTools.article{
+   display:none;
+}
+
+.widget.popularList.mostRead{
+   display:none;
+}
+
+.widget.list.tabList{
+   display:none;
+}
+
+.multimedia.pull1.html{
+   display : none;
+}
+
+.widget.code.html,.widget.code.jsp,.widget.list.simple{
+   display: none;
+}
+
+.ad.widget.mnopolarisAd.placement{
+   display : none;
+}
+
+#dinMatContainer{
+   display : none;
+}
+
+#content tabfilm{
+   display : none;
+}
+
+.widget.relatedContents.factboxes{
+    page-break-before:always;
+}
+
+/* Ny side for kart*/
+.headerMap{
+    page-break-before:always;
+}
+
+.widget.relatedContents.pictures{
+    page-break-before:always;
+}
+
+.widget.feed.rssFull{
+    display:none;
+}
+
+/* Fjerne Google ads Iframe*/
+#google_ads_frame1,.ad{
+    display:none;
+}
