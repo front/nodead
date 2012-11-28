@@ -8,9 +8,9 @@ exports.connection = function (socket) {
   });
 
   // Send the first ad to the client.
-  ads.load(1, function (err, ad) {
-    socket.emit('ad', ad);
-  })
+  ads.getByProfile(socket, function (err, data) {
+    socket.emit('ad', data);
+  });
 
   // User likes an ad.
   socket.on('like', function (data) {
