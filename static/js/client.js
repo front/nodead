@@ -27,10 +27,9 @@ $(function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
     socket.emit('dislike', {"id": current.id, "timeOnAd": timeOnAd});
   });
-  
+
  document.querySelector('#man-toggle')
   .addEventListener('toggle', function(e){
-    alert(e.detail)
     if (e.detail.isActive){
       socket.emit('gender', 'men');
     } else {
