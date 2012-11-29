@@ -27,9 +27,6 @@ exports.init = function (server, cookieParser) {
 }
 
 var connection = function (socket) {
-  // Log the connection.
-  console.log(socket.data.sid + ' connected');
-
   // Pass settings on to the client.
   socket.emit('settings', ads.settings);
 
@@ -40,6 +37,10 @@ var connection = function (socket) {
   socket.on('identify', function (data) {
     // Store data about the client.
     utils.defaults(socket.data, data);
+    socket.data.id = socket.data.sid.substr(0, 10) + ':' + socket.data.role + ':' + socket.id.substr(0, 5);
+
+    // Log the connection.
+    console.log(socket.data.id + ' connected');
 
     // Send the first ads to the client.
     socket.sendAds(socket);
@@ -47,28 +48,21 @@ var connection = function (socket) {
 
   // User likes an ad.
   socket.on('like', function (data) {
-    ads.updateScore(socket, data.id, 1, function (err, category) {
+    data.direction = 1;
+    ads.updateScore(socket, data, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.data.sid + ' on ' + category.name + ': ' + category.score + ' (like after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
+      console.log(socket.data.id + ' on ' + category.name + ': ' + category.score + ' (like after ' + Math.floor(data.time / 1000) + ' seconds)');
       socket.sendAds();
     });
   });
 
   // User doesn't like an ad.
   socket.on('dislike', function (data) {
-    ads.updateScore(socket, data.id, -1, function (err, category) {
+    data.direction = -1;
+    ads.updateScore(socket, data, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.data.sid + ' on ' + category.name + ': ' + category.score + ' (dislike after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
+      console.log(socket.data.id + ' on ' + category.name + ': ' + category.score + ' (dislike after ' + Math.floor(data.time / 1000) + ' seconds)');
       socket.sendAds();
-    });
-  });
-
-  // If client clicks a facebook like, increase he's like of that category by 10
-  socket.on('facebook-like', function (data){
-    if (err) return console.log(err);
-    db.zincrby('user:' + socket.data.sid + ':categories', 10, data.category, function (err, score) {
-      if (err) return console.log(err);
-      console.log(socket.data.sid + ' on ' + data.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
     });
   });
 
@@ -82,8 +76,9 @@ var connection = function (socket) {
     socket.data.gender = gender;
   });
 
+  // Client disconnected.
   socket.on('disconnect', function () {
-    console.log(socket.data.sid + ' disconnected');
+    console.log(socket.data.id + ' disconnected');
   });
 }
 
@@ -122,10 +117,11 @@ socketio.Socket.prototype.sendAds = function (socket) {
     for (var i = clients.length; i--;) {
       var client = clients[i], output = {};
 
-      output.ads = data.ads.splice(0, client.data.ads);
-
       if (client.data.role === 'logger') {
         output.categories = data.categories;
+      }
+      else {
+        output.ads = data.ads.splice(0, client.data.ads);
       }
 
       client.emit('ads', output);

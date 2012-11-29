@@ -11,21 +11,52 @@ ads.settings = {
   likeSeed: 1 // Number of categories to be seeded with promoted categories
 };
 
-// Loads an ad by its ID, could be a database lookup.
-ads.load = function (id, callback) {
+// Algorithms for calculating the change based on type and data from the client.
+var changeAlgorithms = {
+  normal: function (data) {
+    // One can do advanced calculations here based on time or other variables.
+    return data.direction * 1;
+  },
+  facebook: function (data) {
+    // To keep it simple, a like is always 10 points.
+    return 10;
+  }
+};
+
+// Loads an ad by its ID (could be a database lookup).
+ads.loadAd = function (id, callback) {
   callback(null, testdata[id]);
 };
 
-// Updates a user's like/dislike score of an ad's category.
-ads.updateScore = function (socket, id, points, callback) {
-  var self = this;
-  self.load(id, function (err, ad) {
-    if (err) return callback(err);
-    db.zincrby('user:' + socket.data.sid + ':categories', points, ad.category, function (err, score) {
-      callback(err, { name: ad.category, score: score });
+// Updates a user's like/dislike score.
+ads.updateScore = function (socket, data, callback) {
+  var self = this, category;
+
+  // Calculate change based on data.
+  var change = changeAlgorithms[data.type](data);
+  console.log(change);
+
+  // If an ad ID was provided, load it first to get its category.
+  if (data.id) {
+    self.loadAd(data.id, function (err, ad) {
+      if (err) return callback(err);
+      self.incrCategoryScore(socket.data.sid, ad.category, change, callback);
     });
+  }
+  else if (data.category) {
+    self.incrCategoryScore(socket.data.sid, data.category, change, callback);
+  }
+  else {
+    callback('Invalid like/dislike data');
+  }
+};
+
+// Increment/decrement a user's score for a category.
+ads.incrCategoryScore = function (sid, category, change, callback) {
+  db.zincrby('user:' + sid + ':categories', change, category, function (err, score) {
+    callback(err, { name: category, score: score });
   });
-}
+};
 
 // Returns the specified number of random ads from the specified set.
 ads.getRandom = function (count, set, callback) {
@@ -36,12 +67,13 @@ ads.getRandom = function (count, set, callback) {
     set = 'index:all';
   }
 
+  // Load [count] random ad IDs from [set].
   db.srandmember(set, count, function (err, ids) {
     var tasks = [];
 
     // Asynchronously load the returned ads in parallel.
     ids.forEach(function (id) {
-      tasks.push(self.load.bind(self, id));
+      tasks.push(self.loadAd.bind(self, id));
     });
 
     utils.async.parallel(tasks, callback);
