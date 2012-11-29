@@ -1,7 +1,6 @@
 var http = require('http'),
     express = require('express'),
     path = require('path'),
-    socketio = require('socket.io'),
     RedisStore = require('connect-redis')(express);
 
 var utils = require('./utils'),
@@ -39,21 +38,7 @@ utils.each(routes, function (callback, path) {
   app.get(path, callback);
 });
 
-var server = http.createServer(app),
-    io = socketio.listen(server);
-
 // Start up the engine.
+var server = http.createServer(app);
 server.listen(app.get('port'));
-
-// Listen for socket connections.
-io.set('log level', 1);
-io.sockets.on('connection', function (socket) {
-  // Store the client's session ID.
-  cookieParser(socket.handshake, {}, function (err) {
-    if (err) return console.log(err);
-    socket.set('sid', socket.handshake.signedCookies['connect.sid']);
-  });
-
-  // Delegate to connection handler.
-  sockets.connection(socket);
-});
+sockets.init(server, cookieParser);

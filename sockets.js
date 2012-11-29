@@ -1,36 +1,30 @@
+var socketio = require('socket.io');
+
 var utils = require('./utils'),
     db = require('./db'),
     ads = require('./ads');
 
-exports.connection = function (socket) {
-  socket.get('sid', function (err, sid) {
-    if (err) return console.log(err);
-    console.log(sid + ' connected');
-  });
+exports.init = function (server, cookieParser) {
+  var io = socketio.listen(server);
 
-  // Send the first ad to the client.
-  ads.getByProfile(1, socket, function (err, data) {
-    if (err) return console.log(err);
     socket.emit('ad', data);
+  io.set('log level', 1);
+
+  io.sockets.on('connection', function (socket) {
+    // Store user's session ID.
+    socket.getSid(cookieParser, function (err, sid) {
+      if (err) return console.log(err);
+      socket.sid = sid;
+      console.log(sid + ' connected');
+    });
+
+    connection.call(this, socket);
   });
 
-  // User likes an ad.
-  socket.on('like', function (data) {
-    // First load the ad and user's session ID.
-    utils.async.parallel({
-      ad: ads.load.bind(ads, data.id),
-      sid: socket.get.bind(socket, 'sid')
-    },
-    function (err, results) {
-      if (err) return console.log(err);
+  return io;
+}
 
-      var ad = results.ad, sid = results.sid;
-
-      // Increment user's love for the category.
-      db.zincrby('user:' + sid + ':categories', 1, ad.category, function (err, score) {
-        if (err) return console.log(err);
-
-        console.log(sid + ' on ' + ad.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
+var connection = function (socket) {
 
         // Return new ads for this user.
         ads.getByProfile(3, socket, function (err, data) {
