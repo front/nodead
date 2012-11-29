@@ -68,7 +68,7 @@ ads.getRandom = function (count, set, callback) {
   }
 
   // Load [count] random ad IDs from [set].
-  db.srandmember(set, count, function (err, ids) {
+  db.srandmember(set, -count, function (err, ids) {
     var tasks = [];
 
     // Asynchronously load the returned ads in parallel.
