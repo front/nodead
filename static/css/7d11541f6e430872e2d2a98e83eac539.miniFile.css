@@ -2608,7 +2608,7 @@ section.torgetBilAp h2{display:block;color:#fff;font-size:142%;-webkit-transform
 
 /* Added by Joakim */
 #adRight .ad {
-  background: #000 url(../img/ajax-loader.gif) 90px 60px no-repeat;
+  background: #000 url(../img/ajax-loader.gif) 75px 45px no-repeat;
 }
 #adRight .ad img {
   width: 180px;
