@@ -2607,6 +2607,10 @@ section.torgetBilAp h2{display:block;color:#fff;font-size:142%;-webkit-transform
 .Flytoget img{margin-bottom:5px;background-color:#deea84;border-right:2px solid #990;border-bottom:2px solid #990;border-left:2px solid #990;padding-left:5px;width:366px;padding-right:5px;padding-bottom:5px}
 
 /* Added by Joakim */
+#adRight .ad {
+  background: #000 url(../img/ajax-loader.gif) 90px 60px no-repeat;
+}
 #adRight .ad img {
-  width: 250px;
+  width: 180px;
+  height: 120px;
 }

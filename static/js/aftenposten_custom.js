@@ -11,8 +11,7 @@ $(function () {
 
   socket.on('ads', function (data) {
     $.each(data.ads, function (i, ad) {
-      var el = $('<img>').attr('src', ad.img);
-      $('#ad' + i).hide().html(el).fadeIn();
+      $('#ad' + i + ' img').fadeOut().attr('src', ad.img).fadeIn();
     });
   });
 
