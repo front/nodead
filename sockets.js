@@ -32,6 +32,14 @@ var connection = function (socket) {
 
   // Join the room for this user session.
   socket.join(socket.sid);
+  // Client identifies with the server.
+  socket.on('identify', function (data) {
+    // Store data about the client.
+    utils.defaults(socket.data, data);
+
+    // Send the first ads to the client.
+    socket.sendAds(socket);
+  });
 
   // User likes an ad.
   socket.on('like', function (data) {

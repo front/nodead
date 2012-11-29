@@ -4,9 +4,17 @@ $(function () {
   // Holds data for current shown ad
   var current;
 
-  var settings;
+  // Identify this connection with the server.
+  socket.on('connect', function () {
+    socket.emit('identify', {
+      role: 'logger',
+      ads: 1
+    });
+  });
 
-  socket.on('settings', function (data) {
+  // Retrieve settings.
+  var settings;
+  socket.once('settings', function (data) {
     settings = data;
   });
 
