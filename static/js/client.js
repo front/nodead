@@ -7,22 +7,15 @@ $(function () {
   // Identify this connection with the server.
   socket.on('connect', function () {
     socket.emit('identify', {
-      role: 'logger',
+      role: 'master',
       ads: 1
     });
-  });
-
-  // Retrieve settings.
-  var settings;
-  socket.once('settings', function (data) {
-    settings = data;
   });
 
   socket.on('ads', function (data) {
     console.log(data);
     var el = constructNewAdElement(data);
     addNewListElement(el);
-    constructCategoriesList(data);
 
     current = data.ads[0];
     current.timeStart = new Date().getTime();
@@ -30,19 +23,29 @@ $(function () {
   
   $('.slider').on('slide',function(){
     var timeOnAd = new Date().getTime() - current.timeStart;
-    socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
+    socket.emit('like', {
+      type: 'normal',
+      id: current.id,
+      time: timeOnAd
+    });
   });
 
   $('#like').on('click', function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
-    socket.emit('like', {"id": current.id, "timeOnAd": timeOnAd});
-    // $('ul li:first').remove();
-
+    socket.emit('like', {
+      type: 'normal',
+      id: current.id,
+      time: timeOnAd
+    });
   });
 
   $('#dislike').on('click', function () {
     var timeOnAd = new Date().getTime() - current.timeStart;
-    socket.emit('dislike', {"id": current.id, "timeOnAd": timeOnAd});
+    socket.emit('dislike', {
+      type: 'normal',
+      id: current.id,
+      time: timeOnAd
+    });
   });
 
   document.querySelector('#man-toggle')
@@ -67,30 +70,5 @@ $(function () {
   function addNewListElement(el){
     $("ul#ads").append(el);
     $('ul#ads li:first').remove();
-  }
-  function constructCategoriesList(data){
-    $('ul#categories').remove();
-    $('.content').append('<ul class="list" id="categories"></ul>');
-
-    for (var i = 0, l = data.categories.length, seeded = 0; i < l; i++){
-      var category = data.categories[i];
-
-      // Color coding.
-      if (category.score >= settings.likePromote) {
-        category.status = 'promoted';
-      }
-      else if (category.score <= settings.likeExclude) {
-        category.status = 'excluded';
-      }
-      else if (i > 0 && data.categories[0].score >= settings.likePromote && seeded < settings.likeSeed) {
-        category.status = 'seeded';
-        seeded++;
-      }
-      else {
-        category.status = 'inactive';
-      }
-
-      $('ul#categories').append('<li class="' + category.status + '"><a href="#">' + category.name + '<span class="chevron"></span><span class="count">'+category.score+'</span></a></li>' );
-    }
   }
 });
