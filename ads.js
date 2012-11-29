@@ -28,7 +28,7 @@ ads.loadAd = function (id, callback) {
   callback(null, testdata[id]);
 };
 
-// Updates a user's like/dislike score.
+// Updates a user's like/dislike score for a category.
 ads.updateScore = function (socket, data, callback) {
   var self = this, category;
 
@@ -54,6 +54,13 @@ ads.updateScore = function (socket, data, callback) {
 ads.incrCategoryScore = function (sid, category, change, callback) {
   db.zincrby('user:' + sid + ':categories', change, category, function (err, score) {
     callback(err, { name: category, score: score });
+  });
+};
+
+// Resets a user's like/dislike score for a category.
+ads.resetScore = function (socket, data, callback) {
+  db.zadd('user:' + socket.data.sid + ':categories', 0, data.category, function (err) {
+    callback(err, { name: data.category, score: 0 });
   });
 };
 

@@ -42,7 +42,12 @@ $(function () {
         category.status = 'inactive';
       }
 
-      $('ul#categories').append('<li class="' + category.status + '"><a href="#">' + category.name + '<span class="chevron"></span><span class="count">'+category.score+'</span></a></li>' );
+      $('ul#categories').append('<li data:category="' + category.name  + '" class="' + category.status + '"><a href="#">' + category.name + '<span class="chevron"></span><span class="count">'+category.score+'</span></a></li>' );
     }
   }
+
+  $('ul#categories li').live('click', function () {
+    var category = $(this).attr('data:category');
+    socket.emit('reset', { category: category });
+  });
 });

@@ -71,6 +71,15 @@ var connection = function (socket) {
     socket.sendAds();
   });
 
+  // User regrets decisions.
+  socket.on('reset', function (data) {
+    ads.resetScore(socket, data, function (err, category) {
+      if (err) return console.log(err);
+      console.log(socket.data.id + ' ' + category.name + ': ' + category.score + ' (reset)');
+      socket.sendAds();
+    });
+  });
+
   // User has changed gender. (Say what now??)
   socket.on('gender', function (gender) {
     socket.data.gender = gender;
