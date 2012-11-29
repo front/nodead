@@ -34,7 +34,6 @@ ads.updateScore = function (socket, data, callback) {
 
   // Calculate change based on data.
   var change = changeAlgorithms[data.type](data);
-  console.log(change);
 
   // If an ad ID was provided, load it first to get its category.
   if (data.id) {
