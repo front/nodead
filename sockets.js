@@ -89,9 +89,9 @@ var connection = function (socket) {
 
 // Returns the socket client's session ID from Express.
 socketio.Socket.prototype.getSid = function (cookieParser, callback) {
-  var socket = this;
-  cookieParser(socket.handshake, {}, function (err) {
-    callback(err, socket.handshake.signedCookies['connect.sid']);
+  var self = this;
+  cookieParser(self.handshake, {}, function (err) {
+    callback(err, self.handshake.signedCookies['connect.sid']);
   });
 }
 
