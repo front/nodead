@@ -12,15 +12,16 @@ $(function () {
   socket.on('ads', function (data) {
     $.each(data.ads, function (i, ad) {
       var el = $('<img>').attr('src', ad.img);
-      $('#ad' + i).fadeOut().html(el).fadeIn();
+      $('#ad' + i).hide().html(el).fadeIn();
     });
   });
 
-	$('div#facebook_emitter').css("cursor", "pointer");
-
-	$('div#facebook_emitter').on('click', function() {
-    socket.emit('facebook-like', {
-      category: "travel"
-    });
+	$('div#facebook_emitter')
+    .css('cursor', 'pointer')
+    .on('click', function () {
+      socket.emit('like', {
+        type: 'facebook',
+        category: 'travel'
+      });
 	});
 });
