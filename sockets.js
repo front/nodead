@@ -48,20 +48,34 @@ var connection = function (socket) {
 
   // User likes an ad.
   socket.on('like', function (data) {
+    var what;
+    if (data.type === 'normal') {
+      what = 'like after ' + Math.floor(data.time / 1000) + ' seconds';
+    }
+    else if (data.type === 'facebook') {
+      what = 'facebook like';
+    }
+
     data.direction = 1;
     ads.updateScore(socket, data, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.data.id + ' on ' + category.name + ': ' + category.score + ' (like after ' + Math.floor(data.time / 1000) + ' seconds)');
+      console.log(socket.data.id + ' on ' + category.name + ': ' + category.score + ' (' + what + ')');
       socket.sendAds();
     });
   });
 
   // User doesn't like an ad.
   socket.on('dislike', function (data) {
+    var what;
+    if (data.type === 'normal') {
+      what = 'dislike after ' + Math.floor(data.time / 1000) + ' seconds';
+    }
+
     data.direction = -1;
+
     ads.updateScore(socket, data, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.data.id + ' on ' + category.name + ': ' + category.score + ' (dislike after ' + Math.floor(data.time / 1000) + ' seconds)');
+      console.log(socket.data.id + ' ' + category.name + ': ' + category.score + ' (' + what + ')');
       socket.sendAds();
     });
   });
