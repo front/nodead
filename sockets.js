@@ -132,3 +132,8 @@ socketio.Socket.prototype.sendAds = function (socket) {
     }
   });
 };
+
+// Broadcast data to all sockets connected using the socket's session.
+socketio.Socket.prototype.sessBroadcast = function (ev, data) {
+  io.sockets.in(this.data.sid).emit(ev, data);
+};
