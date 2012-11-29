@@ -12,3 +12,15 @@ ul h2{
   top: 10px;
   right: 10px;
 }
+
+ul#categories li.promoted {
+  background-color: #dff0d8;
+}
+
+ul#categories li.seeded {
+  background-color: #fcf8e3;
+}
+
+ul#categories li.excluded {
+  background-color: #f2dede;
+}

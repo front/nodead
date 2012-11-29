@@ -57,8 +57,26 @@ $(function () {
   function constructCategoriesList(data){
     $('ul#categories').remove();
     $('.content').append('<ul class="list" id="categories"></ul>');
-    for (var i = 0; i<data.categories.length; i++){
-      $('ul#categories').append('<li><a href="#">' + data.categories[i].name + '<span class="chevron"></span><span class="count">'+data.categories[i].score+'</span></a></li>' );
+
+    for (var i = 0, l = data.categories.length, seeded = 0; i < l; i++){
+      var category = data.categories[i];
+
+      // Color coding.
+      if (category.score >= settings.likePromote) {
+        category.status = 'promoted';
+      }
+      else if (category.score <= settings.likeExclude) {
+        category.status = 'excluded';
+      }
+      else if (i > 0 && data.categories[0].score >= settings.likePromote && seeded < settings.likeSeed) {
+        category.status = 'seeded';
+        seeded++;
+      }
+      else {
+        category.status = 'inactive';
+      }
+
+      $('ul#categories').append('<li class="' + category.status + '"><a href="#">' + category.name + '<span class="chevron"></span><span class="count">'+category.score+'</span></a></li>' );
     }
   }
 });
