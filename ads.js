@@ -18,8 +18,8 @@ var changeAlgorithms = {
     return data.direction * 1;
   },
   facebook: function (data) {
-    // To keep it simple, a like is always 10 points.
-    return 10;
+    // To keep it simple, a like is always cinq points.
+    return 5;
   }
 };
 
