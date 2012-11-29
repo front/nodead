@@ -67,7 +67,7 @@ var connection = function (socket) {
   });
 
   // User can't get enough of those ads.
-  socket.on('next', function (data) {
+  socket.on('refresh', function (data) {
     socket.sendAds();
   });
 
