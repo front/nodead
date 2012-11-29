@@ -1,20 +1,23 @@
-var socketio = require('socket.io');
+var socketio = require('socket.io'),
+    io;
 
 var utils = require('./utils'),
     db = require('./db'),
     ads = require('./ads');
 
 exports.init = function (server, cookieParser) {
-  var io = socketio.listen(server);
+  io = socketio.listen(server);
 
   io.set('log level', 1);
 
   io.sockets.on('connection', function (socket) {
+    // Shortcut to MemoryStore's data for synchronous access.
+    socket.data = socket.store.data;
+
     // Store user's session ID.
     socket.getSid(cookieParser, function (err, sid) {
       if (err) return console.log(err);
-      socket.sid = sid;
-      console.log(sid + ' connected');
+      socket.data.sid = sid;
     });
 
     connection.call(this, socket);
@@ -24,14 +27,17 @@ exports.init = function (server, cookieParser) {
 }
 
 var connection = function (socket) {
+  // Log the connection.
+  console.log(socket.data.sid + ' connected');
+
   // Pass settings on to the client.
   socket.emit('settings', ads.settings);
 
   // Send the first ad to the client.
   socket.emitAds(socket);
+  // Join the room for the socket's session.
+  socket.join(socket.data.sid);
 
-  // Join the room for this user session.
-  socket.join(socket.sid);
   // Client identifies with the server.
   socket.on('identify', function (data) {
     // Store data about the client.
@@ -45,8 +51,8 @@ var connection = function (socket) {
   socket.on('like', function (data) {
     ads.updateScore(socket, data.id, 1, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.sid + ' on ' + category.name + ': ' + category.score + ' (like after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
-      socket.emitAds();
+      console.log(socket.data.sid + ' on ' + category.name + ': ' + category.score + ' (like after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
+      socket.sendAds();
     });
   });
 
@@ -54,8 +60,8 @@ var connection = function (socket) {
   socket.on('dislike', function (data) {
     ads.updateScore(socket, data.id, -1, function (err, category) {
       if (err) return console.log(err);
-      console.log(socket.sid + ' on ' + category.name + ': ' + category.score + ' (dislike after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
-      socket.emitAds();
+      console.log(socket.data.sid + ' on ' + category.name + ': ' + category.score + ' (dislike after ' + Math.floor(data.timeOnAd / 1000) + ' seconds)');
+      socket.sendAds();
     });
   });
 
@@ -63,9 +69,9 @@ var connection = function (socket) {
   socket.on('facebook-like', function (data){
     console.log(data);
     if (err) return console.log(err);
-    db.zincrby('user:' + socket.sid + ':categories', 10, data.category, function (err, score) {
+    db.zincrby('user:' + socket.data.sid + ':categories', 10, data.category, function (err, score) {
       if (err) return console.log(err);
-      console.log(socket.sid + ' on ' + data.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
+      console.log(socket.data.sid + ' on ' + data.category + ': ' + score + ' (like after ' + Math.floor(data.timeOnAd/1000) + ' seconds)');
     });
   });
 
@@ -76,11 +82,11 @@ var connection = function (socket) {
 
   // User has changed gender. (Say what now??)
   socket.on('gender', function (gender) {
-    socket.gender = gender;
+    socket.data.gender = gender;
   });
 
   socket.on('disconnect', function () {
-    console.log(socket.sid + ' disconnected');
+    console.log(socket.data.sid + ' disconnected');
   });
 }
 

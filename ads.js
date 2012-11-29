@@ -21,7 +21,7 @@ ads.updateScore = function (socket, id, points, callback) {
   var self = this;
   self.load(id, function (err, ad) {
     if (err) return callback(err);
-    db.zincrby('user:' + socket.sid + ':categories', points, ad.category, function (err, score) {
+    db.zincrby('user:' + socket.data.sid + ':categories', points, ad.category, function (err, score) {
       callback(err, { name: ad.category, score: score });
     });
   });
@@ -50,7 +50,7 @@ ads.getRandom = function (count, set, callback) {
 
 // Returns the user's liked/disliked categories with scores, sorted descending.
 ads.getUsersCategories = function (socket, callback) {
-  var args = ['user:' + socket.sid + ':categories', '+inf', '-inf', 'withscores'];
+  var args = ['user:' + socket.data.sid + ':categories', '+inf', '-inf', 'withscores'];
 
   db.zrevrangebyscore(args, function (err, results) {
     var categories = [];
@@ -74,7 +74,7 @@ ads.getUsersCategories = function (socket, callback) {
 ads.getByProfile = function (socket, count, callback) {
   var self = this;
 
-  var userSet = 'user:' + socket.sid + ':ads';
+  var userSet = 'user:' + socket.data.sid + ':ads';
 
   // Get user's liked/disliked categories.
   self.getUsersCategories(socket, function (err, categories) {
@@ -123,8 +123,8 @@ ads.getByProfile = function (socket, count, callback) {
         var set = result ? userSet : 'index:all';
 
         // Filter the user's set by intersecting with the gender's index.
-        if (socket.gender) {
-          db.sinterstore(userSet, set, 'index:gender:' + socket.gender, function (err, result) {
+        if (socket.data.gender) {
+          db.sinterstore(userSet, set, 'index:gender:' + socket.data.gender, function (err, result) {
             callback(err, userSet);
           });
         }
