@@ -13,9 +13,8 @@ $(function () {
   });
 
   socket.on('ads', function (data) {
-    console.log(data);
     var el = constructNewAdElement(data);
-    addNewListElement(el);
+    $('ul#ads').html(el);
 
     current = data.ads[0];
     current.timeStart = new Date().getTime();
@@ -58,17 +57,10 @@ $(function () {
   });
 
   function constructNewAdElement(data){
-    console.log(data.ads[0]);
-    var el = $('<li>',{ 
-      class:"ad"});
-    el.append( '<h2>' + data.ads[0].title + '</h2>');
+    var el = $('<li>', { class: 'ad' });
+    el.append('<h2>' + data.ads[0].title + '</h2>');
     el.append('<img src="' + data.ads[0].img + '">');
     el.append('<span class="slide-text">← Slide me</span>');
     return el;
-  }
-
-  function addNewListElement(el){
-    $("ul#ads").append(el);
-    $('ul#ads li:first').remove();
   }
 });
