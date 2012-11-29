@@ -1,49 +1,68 @@
 var utils = require('./utils'),
     db = require('./db');
 
-// The test data.
 var testdata = require('./testdata.json');
 
 var ads = module.exports = {};
 
 ads.settings = {
-  threshold: 3 // Minimum amount of likes before showing ads of that type
+  likePromote: 3, // Likes at or above this value will promote a category
+  likeExclude: -3, // Likes at or below this value will exclude a category
+  likeSeed: 1 // Number of categories to be seeded with promoted categories
 };
 
-// Loads an ad by its ID.
+// Loads an ad by its ID, could be a database lookup.
 ads.load = function (id, callback) {
   callback(null, testdata[id]);
 };
 
-// Returns the specified number of random ads (defaults to 1).
-ads.getRandom = function (set, amount, callback) {
-  if (utils.isFunction(amount)) {
-    callback = amount;
-    amount = 1;
+// Updates a user's like/dislike score of an ad's category.
+ads.updateScore = function (socket, id, points, callback) {
+  var self = this;
+  self.load(id, function (err, ad) {
+    if (err) return callback(err);
+    db.zincrby('user:' + socket.sid + ':categories', points, ad.category, function (err, score) {
+      callback(err, { name: ad.category, score: score });
+    });
+  });
+}
+
+// Returns the specified number of random ads from the specified set.
+ads.getRandom = function (count, set, callback) {
+  var self = this;
+
+  if (utils.isFunction(set)) {
+    callback = set;
+    set = 'index:all';
   }
 
-  db.srandmember(set, amount, callback);
+  db.srandmember(set, count, function (err, ids) {
+    var tasks = [];
+
+    // Asynchronously load the returned ads in parallel.
+    ids.forEach(function (id) {
+      tasks.push(self.load.bind(self, id));
+    });
+
+    utils.async.parallel(tasks, callback);
+  });
 };
 
-// Returns a user's liked/disliked categories (ordered by score).
-ads.getUsersCategories = function (sid, threshold, callback) {
-  if (utils.isFunction(threshold)) {
-    callback = threshold;
-    threshold = null;
-  }
-
-  var args = ['user:' + sid + ':categories', '+inf', '-inf', 'withscores'];
+// Returns the user's liked/disliked categories with scores, sorted descending.
+ads.getUsersCategories = function (socket, callback) {
+  var args = ['user:' + socket.sid + ':categories', '+inf', '-inf', 'withscores'];
 
   db.zrevrangebyscore(args, function (err, results) {
     var categories = [];
 
+    // Transform redis result to an object structure.
     if (results.length) {
       for (var i = 0, len = results.length / 2; i < len; i++) {
         var item = results.splice(0, 2);
-
-        if (!utils.isNumber(threshold) || item[1] >= threshold) {
-          categories.push({ name: item[0], score: parseInt(item[1], 10) });
-        }
+        categories.push({
+          name: item[0],
+          score: parseInt(item[1], 10)
+        });
       }
     }
 
@@ -51,97 +70,90 @@ ads.getUsersCategories = function (sid, threshold, callback) {
   });
 };
 
-// Returns the specified amount of ads matching the user's profile.
-ads.getByProfile = function (amount, socket, callback) {
+// Returns the specified amount of ads based on the user's profile.
+ads.getByProfile = function (socket, count, callback) {
   var self = this;
 
-  socket.get('sid', function (err, sid) {
-    var userSet = 'user:' + sid + ':ads';
+  var userSet = 'user:' + socket.sid + ':ads';
 
+  // Get user's liked/disliked categories.
+  self.getUsersCategories(socket, function (err, categories) {
     utils.async.waterfall([
-      self.getUsersCategories.bind(self, sid, self.settings.threshold),
-
       // Create user's set of ads from liked categories, if any.
-      function createUserSet (categories, callback) {
-        if (categories.length) {
-          // Destination set.
-          var args = [userSet];
+      function createUserSet (callback) {
+        // The destination is the first argument.
+        var args = [userSet];
 
-          categories.forEach(function (category) {
+        // User has at least one category with enough likes to be promoted.
+        if (categories.length && categories[0].score >= self.settings.likePromote) {
+          // Get promoted + any seeded categories. The categories array is
+          // sorted by score, descending.
+          for (var i = 0, l = categories.length, seeded = 0; i < l; i++) {
+            var category = categories[i];
+
+            // Stop after correct number of seeded categories have been added.
+            if (category.score < self.settings.likePromote) {
+              seeded++;
+              if (seeded > self.settings.likeSeed || category.score <= self.settings.likeExclude) {
+                break;
+              }
+            }
+
             args.push('index:category:' + category.name);
-          });
+          }
 
-          // Store a union of ads from categories into user's set.
           db.sunionstore(args, callback);
         }
         else {
-          // Let the next task know the user hasn't liked any categories enough.
-          callback(null, 0);
+          // User has no promoted categories, so base selection on all ads.
+          args.push('index:all');
+
+          // Filter out ads from categories with a score below exclusion level.
+          for (var i = categories.length; i-- && categories[i].score <= self.settings.likeExclude;) {
+            args.push('index:category:' + categories[i].name);
+          }
+
+          db.sdiffstore(args, callback);
         }
       },
 
       // Filter the user's set by gender, if specified.
-      function filterByGender (result, callback) {
-        socket.get('gender', function (err, gender) {
-          if (!gender) {
-            // No gender has been set, so go to next task. If user has liked
-            // categories, pass user's set. Otherwise, pass index of all ads.
-            callback(null, result ? userSet : 'index:all');
-          }
-          else {
-            var genderIndex = 'index:gender:' + gender;
+      function genderFilter (result, callback) {
+        // If previous task resulted in no ads, base the next steps on all ads.
+        var set = result ? userSet : 'index:all';
 
-            if (result) {
-              // The user has liked some categories, so filter the user's set by
-              // intersecting with the gender's index. Pass the resulting user's
-              // set to the next task as the set to get a random ad from.
-              db.sinterstore(userSet, userSet, genderIndex, function (err, result) {
-                callback(err, userSet);
-              });
-            }
-            else {
-              // No categories have been liked, so pass the gender's index to
-              // the as next task as the set to get a random ad from.
-              callback(null, genderIndex);
-            }
-          }
-        });
+        // Filter the user's set by intersecting with the gender's index.
+        if (socket.gender) {
+          db.sinterstore(userSet, set, 'index:gender:' + socket.gender, function (err, result) {
+            callback(err, userSet);
+          });
+        }
+        else {
+          // No gender has been set, so skip to the next task.
+          callback(null, set);
+        }
       },
 
-      // Get random ads from the set (user's set, gender's index or all ads).
-      function getRandomAd (set, callback) {
-        self.getRandom(set, amount, callback);
+      // Get specified number of ids randomly from the set (user's or all).
+      function getRandomAds (set, callback) {
+        self.getRandom(count, set, callback);
       }
     ],
 
-    // Return results to callback. Output:
-    // {
-    //   ads: [{…}, {…}, …],
-    //   categories: [{…}, {…}, …]
-    // }
-    function (err, ids) {
+    // Return resulting ads together with the user's categories.
+    function (err, ads) {
       if (err) {
         callback(err);
       }
       else {
-        // Load ads and categories in parallel.
-        var tasks = [self.getUsersCategories.bind(self, sid)];
-        ids.forEach(function (id) {
-          tasks.push(self.load.bind(self, id));
-        });
+        var data = {
+          ads: utils.shuffle(ads),
+          categories: categories
+        };
 
-        utils.async.parallel(tasks, function (err, results) {
-          // First item is categories, the rest are ads.
-          var categories = results.shift();
-
-          var data = {
-            ads: results,
-            categories: categories
-          };
-
-          callback(err, data);
-        });
+        callback(null, data);
       }
     });
+
   });
 };
