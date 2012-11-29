@@ -4,7 +4,13 @@ $(function () {
   // Holds data for current shown ad
   var current;
 
-  socket.on('ad', function (data) {
+  var settings;
+
+  socket.on('settings', function (data) {
+    settings = data;
+  });
+
+  socket.on('ads', function (data) {
     console.log(data);
     var el = constructNewAdElement(data);
     addNewListElement(el);

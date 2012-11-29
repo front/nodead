@@ -7,7 +7,6 @@ var utils = require('./utils'),
 exports.init = function (server, cookieParser) {
   var io = socketio.listen(server);
 
-    socket.emit('ad', data);
   io.set('log level', 1);
 
   io.sockets.on('connection', function (socket) {
@@ -25,6 +24,8 @@ exports.init = function (server, cookieParser) {
 }
 
 var connection = function (socket) {
+  // Pass settings on to the client.
+  socket.emit('settings', ads.settings);
 
         // Return new ads for this user.
         ads.getByProfile(3, socket, function (err, data) {
