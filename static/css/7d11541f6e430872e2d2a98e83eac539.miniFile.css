@@ -2605,3 +2605,8 @@ section.torgetBilAp h2{display:block;color:#fff;font-size:142%;-webkit-transform
 .valuta input#innPenger,.valuta input#utPenger{font-size:85%;width:158px}
 .valuta form label{font-weight:bold;font-size:11px}.Flytoget p{font-size:12px;background-color:#deea84;color:#000;font-family:ClanWeb,Arial,sans-serif;font-weight:bold;margin-top:-15px;margin-bottom:0;border-right:2px solid #990;border-left:2px solid #990;padding-left:5px}
 .Flytoget img{margin-bottom:5px;background-color:#deea84;border-right:2px solid #990;border-bottom:2px solid #990;border-left:2px solid #990;padding-left:5px;width:366px;padding-right:5px;padding-bottom:5px}
+
+/* Added by Joakim */
+#adRight .ad img {
+  width: 250px;
+}
