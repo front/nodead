@@ -33,8 +33,6 @@ var connection = function (socket) {
   // Pass settings on to the client.
   socket.emit('settings', ads.settings);
 
-  // Send the first ad to the client.
-  socket.emitAds(socket);
   // Join the room for the socket's session.
   socket.join(socket.data.sid);
 
@@ -67,7 +65,6 @@ var connection = function (socket) {
 
   // If client clicks a facebook like, increase he's like of that category by 10
   socket.on('facebook-like', function (data){
-    console.log(data);
     if (err) return console.log(err);
     db.zincrby('user:' + socket.data.sid + ':categories', 10, data.category, function (err, score) {
       if (err) return console.log(err);
@@ -77,7 +74,7 @@ var connection = function (socket) {
 
   // User can't get enough of those ads.
   socket.on('next', function (data) {
-    socket.emitAds();
+    socket.sendAds();
   });
 
   // User has changed gender. (Say what now??)
@@ -98,19 +95,40 @@ socketio.Socket.prototype.getSid = function (cookieParser, callback) {
   });
 }
 
-// Emits new ads for this socket connection.
-socketio.Socket.prototype.emitAds = function (recipients) {
-  var socket = this;
+// Emits new ads to the specified socket. Defaults to the session's connections.
+socketio.Socket.prototype.sendAds = function (socket) {
+  var self = this, clients, count = 0;
 
-  if (utils.isUndefined(recipients)) {
-    recipients = socket.in(socket.sid);
+  // If no sockets were specified, use the session's socket connections.
+  if (utils.isUndefined(socket)) {
+    socket = io.sockets.in(self.data.sid);
+
+    // Get the number of ads required by the session's clients.
+    var clients = io.sockets.clients(self.data.sid);
+    for (var i = clients.length; i--;) {
+      count += clients[i].data.ads;
+    }
+  }
+  else {
+    clients = [socket];
+    count = socket.data.ads;
   }
 
-  // TODO Not working, recipients should be array of clients connected to room.
-  var count = utils.isArray(recipients) ? recipients.length : 1;
-
-  ads.getByProfile(socket, count, function (err, data) {
+  // Get ads for the clients based on the socket's profile.
+  ads.getByProfile(self, count, function (err, data) {
     if (err) return console.log(err);
-    recipients.emit('ads', data);
+
+    // Send to each client the number of ads that it specified when identifying.
+    for (var i = clients.length; i--;) {
+      var client = clients[i], output = {};
+
+      output.ads = data.ads.splice(0, client.data.ads);
+
+      if (client.data.role === 'logger') {
+        output.categories = data.categories;
+      }
+
+      client.emit('ads', output);
+    }
   });
 };
