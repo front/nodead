@@ -6,13 +6,13 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
-    "express": "3.0.3",
+    "express": "3.x",
     "ejs": "*",
-    "socket.io": "0.9.11",
-    "redis": "0.8.2",
-    "hiredis": "0.1.14",
-    "connect-redis": "1.4.5",
-    "async": "0.1.22",
-    "underscore": "1.4.2"
+    "socket.io": "*",
+    "redis": "*",
+    "hiredis": "*",
+    "connect-redis": "*",
+    "async": "*",
+    "underscore": "*"
   }
 }
