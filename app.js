@@ -40,5 +40,6 @@ utils.each(routes, function (callback, path) {
 
 // Start up the engine.
 var server = http.createServer(app);
+console.log('Server running on port ' +  app.get('port') );
 server.listen(app.get('port'));
 sockets.init(server, cookieParser);
